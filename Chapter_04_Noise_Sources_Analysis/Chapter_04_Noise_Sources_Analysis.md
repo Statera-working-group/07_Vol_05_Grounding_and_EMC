@@ -1,0 +1,390 @@
+**Volume 05. Grounding and EMC**
+
+
+# Chapter 04. Noise Sources Analysis
+
+##  
+
+## 04.01. Switching Power Supply Noise
+
+![](images/image1.png){width="7.268055555555556in" height="7.268055555555556in"}
+
+Switching power supplies are major noise sources in robotic electrical systems because they regulate voltage by rapidly turning semiconductor devices on and off rather than dissipating excess energy continuously. This switching action provides high conversion efficiency, but every transition produces rapid changes in voltage and current. These high dV/dt and dI/dt events create broadband electromagnetic energy that can propagate through power conductors, ground structures, cables, and nearby space.
+
+The fundamental noise mechanism begins at the switching node of a converter. In buck, boost, flyback, and other switched-mode topologies, MOSFETs or similar devices repeatedly connect and disconnect energy-storage components at frequencies ranging from tens of kilohertz to several megahertz. Although the nominal switching frequency may be relatively low, the sharp waveform edges contain harmonics extending far beyond the fundamental frequency and can therefore affect sensitive electronic circuits.
+
+Switching power supply noise should be understood as both differential-mode and common-mode interference. Differential-mode noise flows between the positive and return conductors of the power path and is strongly associated with pulsed converter currents. Common-mode noise flows in the same direction on multiple conductors relative to chassis or surrounding structures. Parasitic capacitance often provides the return path that allows high-frequency common-mode currents to circulate through an otherwise unexpected route.
+
+The current loops inside the converter strongly determine the magnitude of generated electromagnetic interference. During each switching state, current flows through MOSFETs, diodes or synchronous switches, inductors, and capacitors. If the high-frequency loop has a large physical area, its parasitic inductance increases and the loop becomes a stronger magnetic-field source. Compact placement of switching components and short, wide current paths are therefore fundamental EMC requirements rather than merely PCB layout preferences.
+
+Parasitic inductance becomes particularly important during fast current transitions. According to the relationship V = L·dI/dt, even a small interconnection inductance can generate substantial voltage overshoot when current changes rapidly. Package leads, PCB traces, vias, connector pins, and capacitor connections all contribute to this inductance. The resulting ringing can introduce additional spectral peaks and significantly increase emissions beyond those predicted from the nominal switching frequency alone.
+
+Parasitic capacitance produces another important coupling mechanism. Rapid voltage transitions at the switching node drive displacement current according to I = C·dV/dt. Capacitance may exist between semiconductor devices and heat sinks, transformer windings, PCB copper and chassis, or power circuits and nearby signal structures. Consequently, apparently isolated mechanical or electrical structures can become high-frequency current paths and convert localized switching activity into system-level common-mode noise.
+
+Input-side conducted noise occurs because a switching converter does not normally draw perfectly continuous current from its source. Pulsating current is partially supplied by local input capacitors, but residual high-frequency components can travel backward through the power harness toward batteries, PDUs, or upstream converters. If several robotic subsystems share the same DC distribution network, one noisy converter can therefore disturb sensors, communication equipment, computing modules, and other loads connected elsewhere on the vehicle.
+
+Output noise consists of switching ripple, transient components, ringing, and broadband high-frequency energy superimposed on the regulated DC voltage. Output capacitors and inductors reduce this energy, but their effectiveness depends on impedance across frequency rather than nominal capacitance alone. Equivalent series resistance, equivalent series inductance, PCB geometry, and capacitor technology determine whether a component remains useful at the frequencies where switching noise actually exists.
+
+Radiated emission develops when high-frequency switching currents encounter structures capable of acting as antennas. Long power cables, poorly controlled return paths, heat sinks, chassis sections, and cable shields can convert conducted common-mode current into electromagnetic radiation. A converter that performs acceptably as an isolated laboratory board may therefore produce significantly greater emissions after installation in a robot because the final harness and mechanical structure become part of the electromagnetic system.
+
+The switching frequency itself is only the starting point of noise analysis. A converter operating at 500 kHz, for example, can generate energy at integer harmonics and broadband components extending into tens or hundreds of megahertz because of nanosecond-scale switching edges. Resonances caused by parasitic inductance and capacitance may create additional peaks unrelated to simple harmonic predictions. EMC analysis must therefore examine the complete frequency spectrum rather than focusing only on the converter clock.
+
+Control strategy also influences the noise spectrum. Fixed-frequency pulse-width modulation produces relatively predictable spectral lines, whereas pulse skipping, burst operation, variable-frequency control, and discontinuous conduction can create complex low-frequency and broadband signatures. Spread-spectrum modulation intentionally varies the switching frequency to distribute energy across a wider band, reducing peak spectral amplitude, but it does not eliminate the underlying electromagnetic energy or correct poor current-loop design.
+
+Ground architecture determines how converter noise spreads through a robot. If high-current switching returns share impedance with sensor or communication returns, voltage developed across that common impedance can appear directly as unwanted signal disturbance. The problem becomes more severe when multiple DC/DC converters, motor controllers, computers, LiDARs, cameras, and communication interfaces share distributed grounding. High-frequency return-current paths must therefore be considered independently from ideal low-frequency ground assumptions.
+
+Sensitive perception systems can be especially vulnerable to switching power noise. Cameras may exhibit image artifacts or communication errors, LiDAR electronics may experience unstable measurements, and analog sensor interfaces can suffer offset or increased noise floor. Ethernet and other high-speed communication links are primarily differential systems, but excessive common-mode disturbance can still degrade receiver margin or increase emissions through cables and connectors.
+
+Noise reduction should begin at the source rather than relying exclusively on filters. Minimizing switching-loop area, placing decoupling capacitors directly across high-frequency current paths, reducing parasitic inductance, controlling MOSFET transition speed, and managing switching-node copper area can substantially reduce generated energy. Snubber networks or active-clamp techniques may be used to suppress ringing where appropriate, while careful gate-drive design can balance switching loss against EMC performance.
+
+Input and output filtering provides the next level of containment. Differential-mode inductors, capacitors, ferrite elements, common-mode chokes, and feedthrough structures can attenuate unwanted frequency components when their impedances are properly matched to the noise source and load. Filter placement is critical because long conductors between the noise source and filter allow electromagnetic coupling before attenuation occurs. A filter should therefore be located close to the boundary where noise must be contained.
+
+Effective diagnosis requires measurement of both time-domain waveforms and frequency-domain emissions. Oscilloscope measurements can reveal switching-node overshoot, ringing, ripple, and transient behavior, while spectrum analysis helps identify fundamental switching components, harmonics, and resonant peaks. Current probes, differential probes, LISN-based conducted-emission measurements, and near-field probes can help determine whether the dominant mechanism is differential-mode conduction, common-mode conduction, or radiation.
+
+In robotic systems, switching power supply noise must ultimately be treated as a system-integration problem rather than an isolated converter characteristic. Converter topology, PCB layout, grounding, shielding, cable routing, chassis bonding, filter placement, load behavior, and mechanical packaging jointly establish the final EMC performance. Designing these elements together prevents switching energy from migrating into perception, communication, control, and computing subsystems.
+
+스위칭 전원 공급 장치(Switching Power Supply)는 과도한 에너지를 연속적으로 소모하는 대신 반도체 소자(Semiconductor Device)를 빠르게 켜고 끄면서 전압을 조절하기 때문에 로봇 전기 시스템(Robotic Electrical System)의 주요 노이즈원(Noise Source)이 된다. 이러한 스위칭 동작(Switching Action)은 높은 전력 변환 효율을 제공하지만, 각각의 전환 과정에서 전압과 전류가 급격하게 변화한다. 이때 발생하는 높은 전압 변화율(dV/dt)과 전류 변화율(dI/dt)은 광대역 전자기 에너지(Broadband Electromagnetic Energy)를 생성하며, 이는 전원 도체, 접지 구조, 케이블 및 주변 공간을 통해 전파될 수 있다.
+
+기본적인 노이즈 발생 메커니즘(Noise Mechanism)은 컨버터(Converter)의 스위칭 노드(Switching Node)에서 시작된다. 벅(Buck), 부스트(Boost), 플라이백(Flyback) 및 기타 스위치 모드 토폴로지(Switched-Mode Topology)에서는 MOSFET 또는 유사한 소자가 수십 킬로헤르츠에서 수 메가헤르츠에 이르는 주파수로 에너지 저장 부품(Energy-Storage Component)을 반복적으로 연결하고 차단한다. 공칭 스위칭 주파수(Nominal Switching Frequency)가 비교적 낮더라도 급격한 파형 에지(Waveform Edge)는 기본 주파수를 훨씬 넘어서는 고조파(Harmonic)를 포함하므로 민감한 전자 회로에 영향을 줄 수 있다.
+
+스위칭 전원 공급 장치 노이즈는 차동 모드(Differential Mode) 간섭과 공통 모드(Common Mode) 간섭의 두 가지 관점에서 이해해야 한다. 차동 모드 노이즈(Differential-Mode Noise)는 전원 경로의 양극 도체와 리턴 도체 사이에서 흐르며 펄스 형태의 컨버터 전류와 밀접하게 관련된다. 공통 모드 노이즈(Common-Mode Noise)는 섀시(Chassis) 또는 주변 구조물을 기준으로 여러 도체에서 동일한 방향으로 흐른다. 기생 커패시턴스(Parasitic Capacitance)는 예상하지 못한 경로를 통해 고주파 공통 모드 전류가 순환할 수 있도록 리턴 경로(Return Path)를 형성하는 경우가 많다.
+
+컨버터 내부의 전류 루프(Current Loop)는 발생하는 전자기 간섭(Electromagnetic Interference, EMI)의 크기를 크게 좌우한다. 각각의 스위칭 상태에서 전류는 MOSFET, 다이오드(Diode) 또는 동기식 스위치(Synchronous Switch), 인덕터(Inductor), 커패시터(Capacitor)를 통해 흐른다. 고주파 루프의 물리적 면적이 크면 기생 인덕턴스(Parasitic Inductance)가 증가하고 해당 루프가 더욱 강한 자기장 발생원이 된다. 따라서 스위칭 부품의 조밀한 배치와 짧고 넓은 전류 경로는 단순한 인쇄회로기판(Printed Circuit Board, PCB) 레이아웃 선호 사항이 아니라 기본적인 전자기 적합성(Electromagnetic Compatibility, EMC) 요구사항이다.
+
+기생 인덕턴스(Parasitic Inductance)는 빠른 전류 전환 과정에서 특히 중요해진다. V = L·dI/dt 관계식에 따르면 연결 경로에 존재하는 작은 인덕턴스도 전류가 빠르게 변화할 경우 상당한 전압 오버슈트(Voltage Overshoot)를 발생시킬 수 있다. 패키지 리드(Package Lead), PCB 배선, 비아(Via), 커넥터 핀(Connector Pin), 커패시터 연결부 등이 모두 이러한 인덕턴스에 영향을 준다. 그 결과 발생하는 링잉(Ringing)은 추가적인 스펙트럼 피크(Spectral Peak)를 만들고 공칭 스위칭 주파수만으로 예측되는 수준보다 방출(Emission)을 크게 증가시킬 수 있다.
+
+기생 커패시턴스(Parasitic Capacitance)는 또 다른 중요한 결합 메커니즘(Coupling Mechanism)을 형성한다. 스위칭 노드에서 발생하는 급격한 전압 변화는 I = C·dV/dt 관계에 따라 변위 전류(Displacement Current)를 발생시킨다. 이러한 커패시턴스는 반도체 소자와 방열판(Heat Sink), 변압기 권선(Transformer Winding), PCB 구리 패턴과 섀시, 또는 전원 회로와 인접한 신호 구조 사이에 존재할 수 있다. 따라서 겉보기에는 절연된 기계적 또는 전기적 구조도 고주파 전류 경로가 될 수 있으며, 국부적인 스위칭 동작을 시스템 수준의 공통 모드 노이즈로 변환할 수 있다.
+
+입력 측 전도 노이즈(Input-Side Conducted Noise)는 스위칭 컨버터가 일반적으로 전원으로부터 완전히 연속적인 전류를 소비하지 않기 때문에 발생한다. 펄스 전류(Pulsating Current)의 일부는 로컬 입력 커패시터(Local Input Capacitor)를 통해 공급되지만, 잔류 고주파 성분은 전원 하네스(Power Harness)를 따라 배터리, 전력 분배 장치(Power Distribution Unit, PDU) 또는 상위 컨버터로 역방향 전파될 수 있다. 여러 로봇 서브시스템이 동일한 직류 전력 분배망(DC Distribution Network)을 공유하면 하나의 노이즈가 큰 컨버터가 차량의 다른 위치에 연결된 센서, 통신 장비, 컴퓨팅 모듈 및 기타 부하를 방해할 수 있다.
+
+출력 노이즈(Output Noise)는 조정된 직류 전압에 중첩되는 스위칭 리플(Switching Ripple), 과도 성분(Transient Component), 링잉(Ringing) 및 광대역 고주파 에너지로 구성된다. 출력 커패시터와 인덕터는 이러한 에너지를 감소시키지만, 그 효과는 단순한 공칭 커패시턴스가 아니라 주파수에 따른 임피던스(Impedance)에 의해 결정된다. 등가 직렬 저항(Equivalent Series Resistance, ESR), 등가 직렬 인덕턴스(Equivalent Series Inductance, ESL), PCB 구조 및 커패시터 기술은 실제 스위칭 노이즈가 존재하는 주파수 영역에서 해당 부품이 효과적으로 동작할 수 있는지를 결정한다.
+
+방사 방출(Radiated Emission)은 고주파 스위칭 전류가 안테나처럼 동작할 수 있는 구조물을 만나면서 발생한다. 긴 전원 케이블, 적절하게 제어되지 않은 리턴 경로, 방열판, 섀시 구조 및 케이블 실드(Cable Shield)는 전도성 공통 모드 전류를 전자기 방사(Electromagnetic Radiation)로 변환할 수 있다. 따라서 독립된 실험실 보드 상태에서는 양호하게 동작하는 컨버터도 로봇에 실제 장착되면 최종 하네스와 기계 구조가 전자기 시스템의 일부가 되기 때문에 훨씬 큰 방출을 발생시킬 수 있다.
+
+스위칭 주파수(Switching Frequency) 자체는 노이즈 분석의 시작점에 불과하다. 예를 들어 500 kHz로 동작하는 컨버터는 정수배 고조파뿐만 아니라 나노초 수준의 스위칭 에지로 인해 수십 또는 수백 메가헤르츠 영역까지 확장되는 광대역 성분을 생성할 수 있다. 기생 인덕턴스와 커패시턴스로 인한 공진(Resonance)은 단순한 고조파 예측과 관계없는 추가적인 피크를 만들 수 있다. 따라서 EMC 분석에서는 컨버터 클록(Converter Clock)에만 집중하지 않고 전체 주파수 스펙트럼(Frequency Spectrum)을 검토해야 한다.
+
+제어 전략(Control Strategy) 역시 노이즈 스펙트럼에 영향을 준다. 고정 주파수 펄스 폭 변조(Fixed-Frequency Pulse-Width Modulation, PWM)는 비교적 예측 가능한 스펙트럼 라인(Spectral Line)을 생성하지만, 펄스 스키핑(Pulse Skipping), 버스트 동작(Burst Operation), 가변 주파수 제어(Variable-Frequency Control), 불연속 전도(Discontinuous Conduction)는 복잡한 저주파 및 광대역 특성을 만들 수 있다. 확산 스펙트럼 변조(Spread-Spectrum Modulation)는 스위칭 주파수를 의도적으로 변화시켜 에너지를 넓은 주파수 대역으로 분산함으로써 피크 스펙트럼 진폭을 낮추지만, 근본적인 전자기 에너지를 제거하거나 잘못 설계된 전류 루프를 해결하지는 않는다.
+
+접지 아키텍처(Ground Architecture)는 컨버터 노이즈가 로봇 내부에서 어떻게 확산되는지를 결정한다. 고전류 스위칭 리턴 경로가 센서 또는 통신 리턴 경로와 임피던스를 공유하면 해당 공통 임피던스에서 발생하는 전압이 직접적인 불필요 신호 교란으로 나타날 수 있다. 여러 DC/DC 컨버터, 모터 컨트롤러(Motor Controller), 컴퓨터, 라이다(LiDAR), 카메라 및 통신 인터페이스가 분산 접지(Distributed Grounding)를 공유하는 경우 문제가 더욱 심각해질 수 있다. 따라서 고주파 리턴 전류 경로는 이상적인 저주파 접지 가정과 별도로 고려해야 한다.
+
+민감한 인지 시스템(Perception System)은 특히 스위칭 전원 노이즈에 취약할 수 있다. 카메라는 영상 아티팩트(Image Artifact) 또는 통신 오류를 나타낼 수 있고, 라이다 전자 회로는 불안정한 측정 결과를 보일 수 있으며, 아날로그 센서 인터페이스(Analog Sensor Interface)는 오프셋(Offset)이나 노이즈 플로어(Noise Floor)의 증가를 경험할 수 있다. 이더넷(Ethernet)과 기타 고속 통신 링크는 기본적으로 차동 시스템이지만, 과도한 공통 모드 교란은 수신기 마진(Receiver Margin)을 저하시키거나 케이블과 커넥터를 통한 방출을 증가시킬 수 있다.
+
+노이즈 저감(Noise Reduction)은 필터에만 의존하기보다 노이즈 발생원 자체에서 시작해야 한다. 스위칭 루프 면적을 최소화하고, 디커플링 커패시터(Decoupling Capacitor)를 고주파 전류 경로에 직접 배치하며, 기생 인덕턴스를 줄이고, MOSFET 전환 속도를 제어하며, 스위칭 노드의 구리 패턴 면적을 적절하게 관리하면 발생 에너지를 크게 감소시킬 수 있다. 필요한 경우 스너버 네트워크(Snubber Network) 또는 능동 클램프(Active Clamp) 기법을 사용하여 링잉을 억제할 수 있으며, 세심한 게이트 구동 설계(Gate-Drive Design)를 통해 스위칭 손실과 EMC 성능 사이의 균형을 확보할 수 있다.
+
+입력 및 출력 필터링(Input and Output Filtering)은 그다음 단계의 노이즈 억제 수단을 제공한다. 차동 모드 인덕터(Differential-Mode Inductor), 커패시터, 페라이트 소자(Ferrite Element), 공통 모드 초크(Common-Mode Choke), 피드스루 구조(Feedthrough Structure)는 임피던스가 노이즈원과 부하 특성에 적절하게 정합될 경우 불필요한 주파수 성분을 감쇠할 수 있다. 필터와 노이즈원 사이의 도체가 길면 필터에 도달하기 전에 전자기 결합이 발생할 수 있으므로 필터 배치(Filter Placement)가 매우 중요하다. 따라서 필터는 노이즈를 억제해야 하는 경계에 최대한 가깝게 배치해야 한다.
+
+효과적인 진단(Diagnosis)을 위해서는 시간 영역 파형(Time-Domain Waveform)과 주파수 영역 방출(Frequency-Domain Emission)을 모두 측정해야 한다. 오실로스코프(Oscilloscope) 측정은 스위칭 노드의 오버슈트, 링잉, 리플 및 과도 동작을 확인할 수 있으며, 스펙트럼 분석(Spectrum Analysis)은 기본 스위칭 성분, 고조파 및 공진 피크를 식별하는 데 도움이 된다. 전류 프로브(Current Probe), 차동 프로브(Differential Probe), 선로 임피던스 안정화 회로망(Line Impedance Stabilization Network, LISN)을 이용한 전도 방출 측정 및 근접장 프로브(Near-Field Probe)는 지배적인 노이즈 메커니즘이 차동 모드 전도, 공통 모드 전도 또는 방사 중 어느 것인지 판단하는 데 활용할 수 있다.
+
+로봇 시스템에서 스위칭 전원 공급 장치 노이즈는 궁극적으로 개별 컨버터 특성이 아니라 시스템 통합(System Integration) 문제로 다루어야 한다. 컨버터 토폴로지, PCB 레이아웃, 접지, 차폐(Shielding), 케이블 라우팅(Cable Routing), 섀시 본딩(Chassis Bonding), 필터 배치, 부하 동작 및 기계적 패키징(Mechanical Packaging)이 함께 최종 EMC 성능을 결정한다. 이러한 요소를 통합적으로 설계하면 스위칭 에너지가 인지, 통신, 제어 및 컴퓨팅 서브시스템으로 전파되는 것을 방지할 수 있다.
+
+##  
+
+## 04.02. Motor and Inverter Noise
+
+![](images/image2.png){width="7.268055555555556in" height="7.268055555555556in"}
+
+Motor and inverter systems are among the strongest electromagnetic noise sources in robotic electrical architectures because they combine high power, rapidly switched voltage, and large transient current. An inverter converts DC bus power into controlled phase voltages using semiconductor switches operated by pulse-width modulation. The resulting high dV/dt and dI/dt transitions generate conducted and radiated interference that can propagate throughout the robot.
+
+The inverter power stage typically uses MOSFETs, IGBTs, or wide-bandgap devices such as silicon-carbide switches arranged in half-bridge or three-phase bridge structures. Each switching event rapidly transfers current between devices and motor phases. Although the fundamental motor electrical frequency may be relatively low, PWM switching occurs at kilohertz frequencies, while fast semiconductor edges generate spectral energy extending into the megahertz region.
+
+PWM waveforms are intentionally non-sinusoidal because the inverter synthesizes the required motor voltage from discrete DC bus switching states. The motor inductance filters much of the switching waveform into relatively smooth phase current, but high-frequency voltage components remain present at the inverter output. These components produce switching harmonics, ringing, and transient currents that can couple into power distribution, chassis structures, communication cables, and nearby sensor wiring.
+
+The DC-link current loop is a critical source of inverter EMI. During semiconductor commutation, current rapidly transfers between the DC-link capacitor and switching bridge. Parasitic inductance in bus bars, PCB conductors, capacitor terminals, and semiconductor packages produces voltage overshoot according to V = L·dI/dt. Minimizing this commutation-loop area and placing low-inductance DC-link capacitors close to the power switches are therefore fundamental inverter layout requirements.
+
+Motor phase outputs create another major noise path because they repeatedly transition between DC-bus potentials. High dV/dt at each phase terminal drives displacement current through parasitic capacitances inside the motor and cable system. Capacitance exists between motor windings and stator core, phase conductors and cable shields, semiconductor devices and heat sinks, and mechanical structures connected to chassis. These paths transform inverter switching into substantial common-mode current.
+
+Common-mode motor current can flow from inverter phase nodes through winding-to-frame capacitance into the motor housing and then return through chassis, grounding conductors, cable shields, or other structural paths. Because these paths may extend across the robot, common-mode current can generate both conducted and radiated emissions far from the inverter itself. Grounding and bonding must therefore control the complete high-frequency return path rather than only the inverter enclosure.
+
+Differential-mode noise primarily flows between power conductors and is associated with switching and phase-current ripple. Common-mode noise, in contrast, appears simultaneously on multiple conductors relative to chassis. These mechanisms often coexist and may dominate different frequency ranges. Correctly identifying the dominant mode is essential because differential inductors and capacitors address different current paths from common-mode chokes, shielding, and chassis-referenced filtering.
+
+Motor cables can become efficient EMI coupling structures because they carry high-current PWM waveforms over relatively long distances. Large cable loops increase magnetic-field radiation, while common-mode voltage can drive cable conductors and shields as unintended antennas. Routing phase conductors closely together reduces loop area, and properly designed shielded motor cables help contain electric-field coupling and provide a controlled high-frequency return path for common-mode current.
+
+Cable shield termination is particularly important at inverter and motor interfaces. A shield that is connected through a long pigtail introduces significant high-frequency inductance and can lose effectiveness as frequency increases. Low-impedance, 360-degree shield termination to conductive connector shells or chassis structures generally provides better high-frequency performance. The shield connection should be treated as part of the current-return architecture rather than merely as electrostatic protection.
+
+Motor construction also influences EMI behavior. Winding arrangement, stator geometry, insulation structure, rotor configuration, bearing design, and parasitic capacitance determine how switching energy couples into the mechanical assembly. High-frequency common-mode voltage can produce shaft voltage and bearing current. Repeated electrical discharge through bearings can damage bearing surfaces over time, making inverter-generated common-mode noise both an EMC issue and a potential reliability concern.
+
+Fast switching devices improve inverter efficiency by reducing transition losses, but faster edges can increase electromagnetic emissions. Silicon-carbide and other wide-bandgap semiconductors can achieve very high switching speeds, producing substantially greater dV/dt than conventional devices. Gate resistance and gate-driver configuration can be adjusted to control slew rate, allowing designers to trade switching efficiency against voltage overshoot, ringing, insulation stress, and EMC performance.
+
+Dead time and semiconductor commutation behavior can also influence the generated spectrum. Switching transitions involving body diodes, reverse recovery, device output capacitance, and nonlinear parasitic elements can create sharp current pulses and ringing. These effects may not be obvious from ideal inverter models. Practical EMC design therefore requires measurement of switching-node voltage, phase current, DC-link current, and common-mode current under realistic motor loading conditions.
+
+Mechanical operating conditions affect motor and inverter noise as well. Motor speed, torque, modulation index, regenerative braking, acceleration, and load transients change phase current and switching behavior. A robot may therefore exhibit acceptable EMC performance while stationary or lightly loaded but experience interference during rapid acceleration, steering, climbing, or regenerative deceleration. Testing should reproduce representative worst-case operating conditions rather than rely only on idle measurements.
+
+In mobile robots, inverter noise can couple into perception and communication subsystems through shared power, grounding, or physical routing. LiDAR, cameras, GNSS receivers, IMUs, Ethernet links, CAN networks, and analog interfaces may operate near traction wiring. Parallel routing between motor phase cables and sensitive signal harnesses increases coupling. Physical separation, controlled crossing geometry, shielding, and deliberate harness zoning are therefore important system-level countermeasures.
+
+Source suppression should be applied before relying on external filters. Reducing commutation-loop inductance, optimizing bus-bar geometry, placing DC-link capacitors close to switching devices, controlling gate-drive slew rate, and suppressing resonances can significantly reduce generated EMI. RC or RCD snubbers may reduce switching-node ringing, while appropriate dV/dt filters or output reactors can reduce high-frequency voltage stress and noise delivered to long motor cables.
+
+Filtering must be selected according to the identified noise mechanism. DC-side filters can prevent inverter switching noise from propagating into the battery and PDU network, while common-mode chokes and appropriately referenced capacitors can reduce common-mode current. Motor-side reactors, sine-wave filters, or dV/dt filters may be required when cable length, motor insulation stress, or EMC requirements justify them, although added size, mass, loss, and thermal load must be considered.
+
+Diagnosis should combine time-domain and frequency-domain measurements. Differential voltage probes can measure switching-node and phase voltage, while current probes can observe DC-link, phase, shield, or common-mode currents. Spectrum analyzers and near-field probes help identify harmonic structures and localized radiation sources. Measurements under different speed, torque, switching-frequency, and load conditions can reveal which operating state produces the highest electromagnetic disturbance.
+
+Motor and inverter EMI must ultimately be addressed as a complete electromechanical system problem. Semiconductor switching, DC-link design, bus-bar geometry, motor parasitics, cable construction, shield termination, chassis bonding, grounding, filtering, harness routing, and operating conditions jointly determine EMC behavior. Coordinating these elements prevents traction and actuator power electronics from degrading the sensing, communication, computing, and control functions required for reliable robotic operation.
+
+모터 및 인버터 시스템(Motor and Inverter System)은 높은 전력, 빠르게 스위칭되는 전압, 큰 과도 전류(Transient Current)가 결합되기 때문에 로봇 전기 아키텍처(Robotic Electrical Architecture)에서 가장 강력한 전자기 노이즈원(Electromagnetic Noise Source) 중 하나이다. 인버터(Inverter)는 펄스 폭 변조(Pulse-Width Modulation, PWM) 방식으로 동작하는 반도체 스위치(Semiconductor Switch)를 사용하여 직류 버스(DC Bus) 전력을 제어된 상 전압(Phase Voltage)으로 변환한다. 이 과정에서 발생하는 높은 전압 변화율(dV/dt)과 전류 변화율(dI/dt)은 로봇 전체로 전파될 수 있는 전도성 및 방사성 간섭을 생성한다.
+
+인버터 전력단(Inverter Power Stage)은 일반적으로 하프 브리지(Half-Bridge) 또는 3상 브리지(Three-Phase Bridge) 구조로 배치된 MOSFET, IGBT 또는 실리콘 카바이드(Silicon Carbide) 스위치와 같은 와이드 밴드갭 소자(Wide-Bandgap Device)를 사용한다. 각각의 스위칭 동작은 소자와 모터 상 사이에서 전류를 빠르게 전환한다. 기본적인 모터 전기 주파수(Motor Electrical Frequency)는 비교적 낮을 수 있지만 PWM 스위칭은 킬로헤르츠 주파수에서 발생하며, 빠른 반도체 스위칭 에지는 메가헤르츠 영역까지 확장되는 스펙트럼 에너지(Spectral Energy)를 생성한다.
+
+PWM 파형(PWM Waveform)은 개별적인 직류 버스 스위칭 상태로부터 필요한 모터 전압을 합성하기 때문에 의도적으로 비정현파(Non-Sinusoidal Waveform) 형태를 갖는다. 모터 인덕턴스(Motor Inductance)는 스위칭 파형의 상당 부분을 비교적 부드러운 상 전류(Phase Current)로 필터링하지만, 고주파 전압 성분은 인버터 출력에 남아 있다. 이러한 성분은 스위칭 고조파(Switching Harmonic), 링잉(Ringing), 과도 전류를 발생시키며 전력 분배망, 섀시 구조, 통신 케이블 및 인접한 센서 배선으로 결합될 수 있다.
+
+직류 링크 전류 루프(DC-Link Current Loop)는 인버터 전자기 간섭(Electromagnetic Interference, EMI)의 핵심 발생원이다. 반도체 정류 전환(Commutation) 과정에서 전류는 직류 링크 커패시터(DC-Link Capacitor)와 스위칭 브리지(Switching Bridge) 사이에서 빠르게 전환된다. 버스바(Bus Bar), PCB 도체, 커패시터 단자 및 반도체 패키지에 존재하는 기생 인덕턴스(Parasitic Inductance)는 V = L·dI/dt 관계에 따라 전압 오버슈트(Voltage Overshoot)를 발생시킨다. 따라서 정류 전환 루프의 면적을 최소화하고 저인덕턴스 직류 링크 커패시터를 전력 스위치 가까이에 배치하는 것은 인버터 레이아웃의 기본 요구사항이다.
+
+모터 상 출력(Motor Phase Output)은 각 상 단자가 직류 버스 전위 사이를 반복적으로 전환하기 때문에 또 다른 주요 노이즈 경로를 형성한다. 각 상 단자에서 발생하는 높은 dV/dt는 모터 및 케이블 시스템 내부의 기생 커패시턴스(Parasitic Capacitance)를 통해 변위 전류(Displacement Current)를 발생시킨다. 모터 권선과 고정자 코어(Stator Core), 상 도체와 케이블 실드(Cable Shield), 반도체 소자와 방열판(Heat Sink), 섀시에 연결된 기계 구조 사이에는 커패시턴스가 존재한다. 이러한 경로는 인버터 스위칭을 상당한 공통 모드 전류(Common-Mode Current)로 변환한다.
+
+공통 모드 모터 전류(Common-Mode Motor Current)는 인버터 상 노드에서 권선-프레임 간 커패시턴스(Winding-to-Frame Capacitance)를 통해 모터 하우징으로 흐른 후 섀시, 접지 도체, 케이블 실드 또는 기타 구조적 경로를 통해 되돌아갈 수 있다. 이러한 경로는 로봇 전체에 걸쳐 형성될 수 있기 때문에 공통 모드 전류는 인버터에서 멀리 떨어진 위치에서도 전도성 및 방사성 방출을 발생시킬 수 있다. 따라서 접지(Grounding)와 본딩(Bonding)은 인버터 인클로저만이 아니라 전체 고주파 리턴 경로(High-Frequency Return Path)를 제어해야 한다.
+
+차동 모드 노이즈(Differential-Mode Noise)는 주로 전력 도체 사이를 흐르며 스위칭 및 상 전류 리플(Phase-Current Ripple)과 관련된다. 반면 공통 모드 노이즈(Common-Mode Noise)는 섀시를 기준으로 여러 도체에 동시에 나타난다. 두 메커니즘은 함께 존재하며 서로 다른 주파수 영역에서 각각 지배적일 수 있다. 차동 인덕터(Differential Inductor)와 커패시터가 다루는 전류 경로는 공통 모드 초크(Common-Mode Choke), 차폐(Shielding), 섀시 기준 필터링(Chassis-Referenced Filtering)이 다루는 경로와 다르므로 지배적인 모드를 정확히 식별하는 것이 중요하다.
+
+모터 케이블(Motor Cable)은 비교적 긴 거리에 걸쳐 고전류 PWM 파형을 전달하기 때문에 효과적인 EMI 결합 구조가 될 수 있다. 케이블 루프 면적이 크면 자기장 방사(Magnetic-Field Radiation)가 증가하며, 공통 모드 전압은 케이블 도체와 실드를 의도하지 않은 안테나(Unintended Antenna)처럼 동작하게 할 수 있다. 상 도체를 서로 가깝게 배치하면 루프 면적을 줄일 수 있으며, 적절하게 설계된 차폐 모터 케이블(Shielded Motor Cable)은 전기장 결합을 억제하고 공통 모드 전류에 제어된 고주파 리턴 경로를 제공한다.
+
+케이블 실드 종단(Cable Shield Termination)은 인버터와 모터 인터페이스에서 특히 중요하다. 긴 피그테일(Pigtail)을 통해 연결된 실드는 상당한 고주파 인덕턴스를 발생시키며 주파수가 높아질수록 차폐 효과를 잃을 수 있다. 전도성 커넥터 셸(Conductive Connector Shell)이나 섀시 구조에 대한 저임피던스 360도 실드 종단(360-Degree Shield Termination)은 일반적으로 더 우수한 고주파 성능을 제공한다. 실드 연결은 단순한 정전기 보호가 아니라 전류 리턴 아키텍처(Current-Return Architecture)의 일부로 다루어야 한다.
+
+모터 구조(Motor Construction) 역시 EMI 특성에 영향을 준다. 권선 배치(Winding Arrangement), 고정자 형상(Stator Geometry), 절연 구조, 회전자 구성(Rotor Configuration), 베어링 설계(Bearing Design), 기생 커패시턴스는 스위칭 에너지가 기계적 조립체로 결합되는 방식을 결정한다. 고주파 공통 모드 전압은 축 전압(Shaft Voltage)과 베어링 전류(Bearing Current)를 발생시킬 수 있다. 베어링을 통한 반복적인 전기 방전은 시간이 지남에 따라 베어링 표면을 손상시킬 수 있으므로 인버터에서 발생하는 공통 모드 노이즈는 EMC 문제인 동시에 잠재적인 신뢰성 문제이기도 하다.
+
+고속 스위칭 소자(Fast Switching Device)는 전환 손실(Transition Loss)을 줄여 인버터 효율을 향상시키지만, 더 빠른 스위칭 에지는 전자기 방출을 증가시킬 수 있다. 실리콘 카바이드 및 기타 와이드 밴드갭 반도체(Wide-Bandgap Semiconductor)는 매우 높은 스위칭 속도를 구현할 수 있으며 기존 소자보다 훨씬 높은 dV/dt를 발생시킬 수 있다. 게이트 저항(Gate Resistance)과 게이트 드라이버(Gate Driver) 구성을 조정하여 슬루율(Slew Rate)을 제어하면 스위칭 효율과 전압 오버슈트, 링잉, 절연 스트레스(Insulation Stress), EMC 성능 사이의 균형을 조절할 수 있다.
+
+데드 타임(Dead Time)과 반도체 정류 전환 특성(Semiconductor Commutation Behavior)도 발생하는 노이즈 스펙트럼에 영향을 줄 수 있다. 바디 다이오드(Body Diode), 역회복(Reverse Recovery), 소자 출력 커패시턴스(Device Output Capacitance), 비선형 기생 소자와 관련된 스위칭 전환은 급격한 전류 펄스와 링잉을 발생시킬 수 있다. 이러한 현상은 이상적인 인버터 모델에서는 명확하게 나타나지 않을 수 있다. 따라서 실제 EMC 설계에서는 현실적인 모터 부하 조건에서 스위칭 노드 전압, 상 전류, 직류 링크 전류 및 공통 모드 전류를 측정해야 한다.
+
+기계적 운전 조건(Mechanical Operating Condition)도 모터 및 인버터 노이즈에 영향을 준다. 모터 속도, 토크, 변조 지수(Modulation Index), 회생 제동(Regenerative Braking), 가속 및 부하 과도 상태(Load Transient)는 상 전류와 스위칭 동작을 변화시킨다. 따라서 로봇은 정지 상태나 경부하 상태에서는 양호한 EMC 성능을 나타내더라도 급가속, 조향, 경사로 주행 또는 회생 감속 과정에서는 간섭이 발생할 수 있다. 시험에서는 단순한 유휴 상태 측정에 의존하지 않고 대표적인 최악 조건(Worst-Case Operating Condition)을 재현해야 한다.
+
+이동 로봇(Mobile Robot)에서 인버터 노이즈는 공유 전원, 접지 또는 물리적 배선 경로를 통해 인지 및 통신 서브시스템으로 결합될 수 있다. 라이다(LiDAR), 카메라, 위성항법시스템(GNSS) 수신기, 관성측정장치(Inertial Measurement Unit, IMU), 이더넷(Ethernet), CAN 네트워크 및 아날로그 인터페이스가 구동계 배선(Traction Wiring) 가까이에 배치될 수 있다. 모터 상 케이블과 민감한 신호 하네스를 평행하게 배선하면 결합이 증가하므로 물리적 이격, 제어된 교차 배선, 차폐 및 의도적인 하네스 구역화(Harness Zoning)가 중요한 시스템 수준 대책이다.
+
+외부 필터에 의존하기 전에 발생원 억제(Source Suppression)를 적용해야 한다. 정류 전환 루프 인덕턴스를 줄이고, 버스바 형상을 최적화하며, 직류 링크 커패시터를 스위칭 소자 가까이에 배치하고, 게이트 구동 슬루율을 제어하며, 공진을 억제하면 발생하는 EMI를 크게 줄일 수 있다. RC 또는 RCD 스너버(Snubber)는 스위칭 노드의 링잉을 감소시킬 수 있으며, 적절한 전압 변화율 필터(dV/dt Filter) 또는 출력 리액터(Output Reactor)는 긴 모터 케이블로 전달되는 고주파 전압 스트레스와 노이즈를 감소시킬 수 있다.
+
+필터링(Filtering)은 식별된 노이즈 메커니즘에 따라 선택해야 한다. 직류 측 필터(DC-Side Filter)는 인버터 스위칭 노이즈가 배터리와 PDU 네트워크로 전파되는 것을 방지할 수 있으며, 공통 모드 초크와 적절한 기준점에 연결된 커패시터는 공통 모드 전류를 감소시킬 수 있다. 케이블 길이, 모터 절연 스트레스 또는 EMC 요구사항에 따라 모터 측 리액터(Motor-Side Reactor), 정현파 필터(Sine-Wave Filter) 또는 dV/dt 필터가 필요할 수 있지만, 추가되는 크기, 질량, 손실 및 열 부하(Thermal Load)도 함께 고려해야 한다.
+
+진단(Diagnosis)은 시간 영역(Time Domain)과 주파수 영역(Frequency Domain) 측정을 함께 수행해야 한다. 차동 전압 프로브(Differential Voltage Probe)는 스위칭 노드 및 상 전압을 측정할 수 있으며, 전류 프로브(Current Probe)는 직류 링크, 상, 실드 또는 공통 모드 전류를 관찰할 수 있다. 스펙트럼 분석기(Spectrum Analyzer)와 근접장 프로브(Near-Field Probe)는 고조파 구조와 국부적인 방사원을 식별하는 데 도움이 된다. 서로 다른 속도, 토크, 스위칭 주파수 및 부하 조건에서 측정하면 어떤 운전 상태에서 가장 큰 전자기 교란이 발생하는지 확인할 수 있다.
+
+모터 및 인버터 전자기 간섭(Motor and Inverter EMI)은 궁극적으로 완전한 전기기계 시스템(Electromechanical System)의 문제로 다루어야 한다. 반도체 스위칭, 직류 링크 설계, 버스바 형상, 모터 기생 성분, 케이블 구조, 실드 종단, 섀시 본딩, 접지, 필터링, 하네스 라우팅 및 운전 조건이 함께 EMC 특성을 결정한다. 이러한 요소들을 통합적으로 조정하면 구동계 및 액추에이터 전력 전자장치(Traction and Actuator Power Electronics)가 안정적인 로봇 운용에 필요한 센싱, 통신, 컴퓨팅 및 제어 기능의 성능을 저하시키는 것을 방지할 수 있다.
+
+##  
+
+## 04.03. Radiated vs Conducted Emission
+
+![](images/image3.png){width="7.268055555555556in" height="7.268055555555556in"}
+
+Radiated and conducted emissions are the two principal paths by which unwanted electromagnetic energy leaves an electrical or electronic subsystem. Conducted emission propagates through physical conductors such as power lines, ground paths, and signal cables, while radiated emission propagates through electromagnetic fields in surrounding space. In robotic systems, both mechanisms frequently originate from the same switching events and can interact through cables, chassis structures, and grounding networks.
+
+Conducted emission is produced when noise voltage or current generated inside a device enters external wiring. Switching power supplies, motor inverters, DC/DC converters, digital processors, and high-speed communication interfaces can inject high-frequency components into shared power and return networks. Once coupled onto a harness, this energy may travel through a PDU, battery bus, grounding system, or signal cable and interfere with equipment located far from the original noise source.
+
+Radiated emission occurs when time-varying currents and voltages generate electric and magnetic fields that couple into surrounding space. High dV/dt nodes are strong electric-field sources, while high dI/dt current loops are strong magnetic-field sources. PCB traces, bus bars, heat sinks, cable shields, motor cables, and chassis structures can become effective radiating elements when switching energy excites them at frequencies where their dimensions and impedances support significant electromagnetic coupling.
+
+The distinction between conducted and radiated emission is useful for engineering analysis, but the two mechanisms are not completely independent. Conducted common-mode current flowing along a long cable can transform the cable into an antenna and produce radiated emission. Conversely, an electromagnetic field generated by a nearby inverter or motor cable can couple into another harness and appear as conducted noise at the input of a sensitive electronic module. EMC diagnosis must therefore examine conversion between propagation mechanisms.
+
+Frequency strongly influences which propagation mechanism becomes dominant. At relatively low frequencies, circuit dimensions are usually much smaller than the electromagnetic wavelength, so noise commonly propagates through conductive paths and lumped impedances. As frequency increases, parasitic capacitance, parasitic inductance, cable length, enclosure openings, and structural resonances become increasingly important. A system that behaves like a simple circuit at low frequency can behave like a distributed electromagnetic structure at higher frequency.
+
+Differential-mode conducted emission appears as unwanted voltage or current between two intended conductors, such as the positive and negative lines of a DC supply. It is commonly generated by pulsed load current and switching-current loops. The noise travels outward through the same conductors used to deliver useful power. Input capacitors, differential inductors, LC filters, and careful current-loop design are typical methods used to reduce this propagation mechanism.
+
+Common-mode conducted emission flows in the same direction on multiple conductors relative to chassis or another reference structure. Parasitic capacitance often creates the return path for this current. Fast switching nodes in power converters and motor inverters can capacitively couple current into heat sinks, motor frames, cable shields, or chassis. Common-mode noise is especially important because even relatively small currents can generate substantial radiated emission when they flow along long cables.
+
+Radiated emission can also be interpreted according to electric-field and magnetic-field coupling. A high-voltage switching node with a large exposed conductive area can capacitively couple electric fields into nearby structures. A high-current loop with a large physical area produces stronger magnetic fields. Reducing switching-node area, minimizing current-loop area, maintaining close forward and return paths, and controlling shielding boundaries directly reduce the electromagnetic structures responsible for radiation.
+
+Near-field and far-field behavior provide another useful distinction. Close to a noise source, electric and magnetic fields can behave relatively independently, and near-field probes can identify localized high dV/dt nodes or high dI/dt loops. At greater distance, the fields develop into electromagnetic radiation with a predictable relationship between electric and magnetic components. This distinction is important when diagnosing whether an emission originates from a PCB region, cable, connector, enclosure opening, or larger system structure.
+
+Cables frequently provide the bridge between conducted and radiated emissions in robots. A motor phase cable may carry PWM-related common-mode current, while a power harness can carry converter switching noise and a communication cable can carry unwanted common-mode energy. If cable length becomes electromagnetically significant, the cable can radiate efficiently. Cable routing, twisting, shielding, termination, connector design, and chassis bonding therefore influence both conducted and radiated EMC performance.
+
+The robot chassis can either help contain noise or unintentionally participate in its propagation. A well-bonded conductive chassis can provide a low-impedance high-frequency return path and support effective cable-shield termination. Poor bonding between panels, long grounding straps, painted interfaces, or uncontrolled mechanical joints can increase impedance and create voltage differences between structural regions. The chassis may then become part of a resonant current path or radiating structure rather than an effective EMC reference.
+
+Conducted-emission control should begin by preventing noise from entering external wiring. High-frequency decoupling capacitors should be placed close to switching current loops, while input and output filters should be positioned near the interface through which noise could escape. Differential-mode filters suppress line-to-line noise, whereas common-mode chokes and appropriately connected capacitors control common-mode currents. Filter effectiveness depends strongly on parasitic impedance, grounding, placement, and physical layout.
+
+Radiated-emission reduction requires control of both the noise source and the antenna structure. Slowing excessive switching edges, reducing ringing, minimizing loop area, shortening noisy conductors, shielding cables, and improving enclosure continuity can reduce radiation. Shielding is most effective when electromagnetic energy is contained before it reaches external wiring. Openings, seams, connectors, and cable penetrations must therefore be treated as part of the shielding system rather than considered independently from the enclosure.
+
+Harness segregation is particularly important in robotic platforms containing motors, inverters, sensors, and high-speed computing. High-current PWM cables should not be routed in long parallel paths beside camera, LiDAR, GNSS, Ethernet, or low-level analog wiring. Increasing separation reduces capacitive and inductive coupling, while controlled crossing angles reduce interaction length. Proper zoning of power, actuator, communication, and sensor harnesses prevents radiated energy from becoming conducted interference in sensitive circuits.
+
+Conducted emissions are commonly evaluated by measuring noise voltage or current at defined electrical interfaces. A line impedance stabilization network, or LISN, provides a controlled impedance and measurement point for power-line emissions, while current probes can measure common-mode or differential-mode currents on cables. Spectrum analysis then identifies switching fundamentals, harmonics, resonances, and broadband components, allowing engineers to correlate measured peaks with specific operating mechanisms.
+
+Radiated-emission diagnosis uses antennas and near-field probes to identify electromagnetic energy leaving the system. Electric-field and magnetic-field probes can localize PCB switching nodes, current loops, connectors, and cable regions during development. Formal radiated-emission testing evaluates the electromagnetic field at specified distances and configurations. Rotating or repositioning the equipment and cables can reveal directional radiation patterns and identify structures acting as dominant antennas.
+
+Measurement results should always be correlated with operating state. Motor speed, inverter load, switching frequency, processor activity, communication traffic, converter mode, and regenerative braking can change both conducted and radiated spectra. Turning individual subsystems on and off or varying their operating conditions can reveal the responsible source. Time-domain measurements can then confirm whether spectral peaks correspond to PWM transitions, clock activity, ringing, communication edges, or periodic control events.
+
+For robotic EMC engineering, radiated and conducted emissions should ultimately be analyzed as interconnected manifestations of the same electromagnetic energy. Source generation, coupling path, propagation structure, and receiving subsystem form a complete interference chain. PCB layout, filtering, grounding, shielding, chassis bonding, connector design, and harness routing must therefore be coordinated so that noise is reduced at its source, blocked along conductive paths, and prevented from exciting radiating structures.
+
+방사 방출(Radiated Emission)과 전도 방출(Conducted Emission)은 원하지 않는 전자기 에너지(Electromagnetic Energy)가 전기 또는 전자 서브시스템 외부로 전달되는 두 가지 주요 경로이다. 전도 방출은 전원선, 접지 경로 및 신호 케이블과 같은 물리적 도체를 통해 전파되는 반면, 방사 방출은 주변 공간의 전자기장(Electromagnetic Field)을 통해 전파된다. 로봇 시스템에서는 두 메커니즘이 동일한 스위칭 동작에서 발생하는 경우가 많으며 케이블, 섀시 구조 및 접지 네트워크를 통해 서로 영향을 줄 수 있다.
+
+전도 방출(Conducted Emission)은 장치 내부에서 발생한 노이즈 전압 또는 전류가 외부 배선으로 유입될 때 발생한다. 스위칭 전원 공급 장치(Switching Power Supply), 모터 인버터(Motor Inverter), DC/DC 컨버터(DC/DC Converter), 디지털 프로세서(Digital Processor), 고속 통신 인터페이스(High-Speed Communication Interface)는 공유 전원 및 리턴 네트워크에 고주파 성분을 주입할 수 있다. 하네스에 결합된 에너지는 전력 분배 장치(PDU), 배터리 버스, 접지 시스템 또는 신호 케이블을 따라 이동하여 원래의 노이즈원에서 멀리 떨어진 장비까지 간섭할 수 있다.
+
+방사 방출(Radiated Emission)은 시간에 따라 변화하는 전류와 전압이 전기장 및 자기장을 생성하고 이러한 장(Field)이 주변 공간으로 결합될 때 발생한다. 높은 전압 변화율(dV/dt)을 갖는 노드는 강한 전기장 발생원이 되며, 높은 전류 변화율(dI/dt)을 갖는 전류 루프는 강한 자기장 발생원이 된다. PCB 배선, 버스바(Bus Bar), 방열판(Heat Sink), 케이블 실드(Cable Shield), 모터 케이블 및 섀시 구조는 스위칭 에너지가 구조의 크기와 임피던스 특성에 적합한 주파수로 여기될 경우 효과적인 방사 구조가 될 수 있다.
+
+전도 방출과 방사 방출의 구분은 공학적 분석에 유용하지만 두 메커니즘이 완전히 독립적인 것은 아니다. 긴 케이블을 따라 흐르는 전도성 공통 모드 전류(Common-Mode Current)는 케이블을 안테나로 변화시켜 방사 방출을 발생시킬 수 있다. 반대로 인접한 인버터 또는 모터 케이블에서 생성된 전자기장은 다른 하네스에 결합되어 민감한 전자 모듈의 입력에서 전도 노이즈로 나타날 수 있다. 따라서 EMC 진단에서는 서로 다른 전파 메커니즘 사이의 변환도 함께 분석해야 한다.
+
+주파수(Frequency)는 어떤 전파 메커니즘이 지배적인지를 결정하는 데 큰 영향을 준다. 비교적 낮은 주파수에서는 회로의 크기가 일반적으로 전자기 파장(Electromagnetic Wavelength)보다 훨씬 작기 때문에 노이즈는 주로 전도 경로와 집중정수 임피던스(Lumped Impedance)를 통해 전파된다. 주파수가 증가하면 기생 커패시턴스(Parasitic Capacitance), 기생 인덕턴스(Parasitic Inductance), 케이블 길이, 인클로저 개구부(Enclosure Opening) 및 구조적 공진(Structural Resonance)이 점점 중요해진다. 저주파에서 단순한 회로처럼 동작하는 시스템도 고주파에서는 분포형 전자기 구조(Distributed Electromagnetic Structure)처럼 동작할 수 있다.
+
+차동 모드 전도 방출(Differential-Mode Conducted Emission)은 직류 전원의 양극과 음극 선처럼 의도된 두 도체 사이에서 원하지 않는 전압 또는 전류 형태로 나타난다. 이는 일반적으로 펄스 부하 전류(Pulsed Load Current)와 스위칭 전류 루프에 의해 발생한다. 노이즈는 유효 전력을 전달하는 것과 동일한 도체를 통해 외부로 전파된다. 입력 커패시터, 차동 인덕터(Differential Inductor), LC 필터(LC Filter), 세심한 전류 루프 설계가 이러한 전파 메커니즘을 줄이는 대표적인 방법이다.
+
+공통 모드 전도 방출(Common-Mode Conducted Emission)은 섀시 또는 다른 기준 구조를 기준으로 여러 도체에서 동일한 방향으로 흐른다. 기생 커패시턴스가 이러한 전류의 리턴 경로(Return Path)를 형성하는 경우가 많다. 전력 컨버터와 모터 인버터의 빠른 스위칭 노드는 방열판, 모터 프레임, 케이블 실드 또는 섀시에 전류를 용량성 결합(Capacitive Coupling)시킬 수 있다. 공통 모드 노이즈는 비교적 작은 전류라도 긴 케이블을 따라 흐를 경우 상당한 방사 방출을 발생시킬 수 있기 때문에 특히 중요하다.
+
+방사 방출은 전기장 결합(Electric-Field Coupling)과 자기장 결합(Magnetic-Field Coupling)의 관점에서도 이해할 수 있다. 노출된 도전성 면적이 큰 고전압 스위칭 노드는 주변 구조에 전기장을 용량성으로 결합시킬 수 있다. 물리적 면적이 큰 고전류 루프는 더 강한 자기장을 생성한다. 스위칭 노드 면적 감소, 전류 루프 면적 최소화, 순방향 및 리턴 경로의 근접 배치, 차폐 경계(Shielding Boundary) 제어는 방사를 발생시키는 전자기 구조를 직접적으로 감소시킨다.
+
+근접장(Near Field)과 원거리장(Far Field)의 특성은 방사 현상을 이해하는 또 다른 중요한 구분이다. 노이즈원 가까이에서는 전기장과 자기장이 비교적 독립적으로 동작할 수 있으며, 근접장 프로브(Near-Field Probe)를 사용하여 높은 dV/dt 노드 또는 높은 dI/dt 루프를 국부적으로 식별할 수 있다. 더 먼 거리에서는 전기장과 자기장 사이에 일정한 관계를 갖는 전자기 방사로 발전한다. 이러한 구분은 방출원이 PCB 영역, 케이블, 커넥터, 인클로저 개구부 또는 더 큰 시스템 구조 중 어디에 위치하는지를 진단할 때 중요하다.
+
+케이블은 로봇에서 전도 방출과 방사 방출을 연결하는 매개체 역할을 하는 경우가 많다. 모터 상 케이블(Motor Phase Cable)은 PWM 관련 공통 모드 전류를 전달할 수 있고, 전원 하네스는 컨버터 스위칭 노이즈를 전달하며, 통신 케이블은 원하지 않는 공통 모드 에너지를 운반할 수 있다. 케이블 길이가 전자기적으로 유의미한 수준이 되면 케이블은 효율적으로 방사할 수 있다. 따라서 케이블 라우팅, 트위스팅(Twisting), 차폐, 종단(Termination), 커넥터 설계 및 섀시 본딩(Chassis Bonding)은 전도 및 방사 EMC 성능 모두에 영향을 준다.
+
+로봇 섀시(Robot Chassis)는 노이즈를 억제하는 데 도움을 줄 수도 있지만 의도하지 않게 노이즈 전파에 참여할 수도 있다. 적절하게 본딩된 도전성 섀시는 저임피던스 고주파 리턴 경로를 제공하고 효과적인 케이블 실드 종단을 지원할 수 있다. 패널 사이의 불량한 본딩, 긴 접지 스트랩(Grounding Strap), 도장된 접촉면 또는 제어되지 않은 기계적 접합부는 임피던스를 증가시키고 구조 영역 사이에 전위차를 만들 수 있다. 이 경우 섀시는 효과적인 EMC 기준 구조가 아니라 공진 전류 경로나 방사 구조의 일부가 될 수 있다.
+
+전도 방출 제어(Conducted-Emission Control)는 노이즈가 외부 배선으로 유입되는 것을 방지하는 것에서 시작해야 한다. 고주파 디커플링 커패시터(High-Frequency Decoupling Capacitor)는 스위칭 전류 루프 가까이에 배치해야 하며, 입력 및 출력 필터는 노이즈가 빠져나갈 수 있는 인터페이스 가까이에 배치해야 한다. 차동 모드 필터(Differential-Mode Filter)는 선간 노이즈를 억제하고, 공통 모드 초크(Common-Mode Choke)와 적절하게 연결된 커패시터는 공통 모드 전류를 제어한다. 필터 성능은 기생 임피던스, 접지, 배치 및 물리적 레이아웃에 크게 좌우된다.
+
+방사 방출 감소(Radiated-Emission Reduction)를 위해서는 노이즈 발생원과 안테나 구조를 모두 제어해야 한다. 과도하게 빠른 스위칭 에지를 완화하고, 링잉(Ringing)을 감소시키며, 루프 면적을 최소화하고, 노이즈 도체를 짧게 하며, 케이블을 차폐하고, 인클로저 연속성(Enclosure Continuity)을 개선하면 방사를 줄일 수 있다. 차폐는 전자기 에너지가 외부 배선에 도달하기 전에 억제할 때 가장 효과적이다. 따라서 개구부, 이음부(Seam), 커넥터 및 케이블 관통부는 인클로저와 별개의 요소가 아니라 전체 차폐 시스템의 일부로 다루어야 한다.
+
+하네스 분리(Harness Segregation)는 모터, 인버터, 센서 및 고속 컴퓨팅 장치를 포함하는 로봇 플랫폼에서 특히 중요하다. 고전류 PWM 케이블은 카메라, 라이다(LiDAR), 위성항법시스템(GNSS), 이더넷(Ethernet) 또는 저레벨 아날로그 배선과 긴 구간에 걸쳐 평행하게 배치해서는 안 된다. 이격 거리를 늘리면 용량성 및 유도성 결합을 줄일 수 있고, 제어된 교차 각도는 상호작용 길이를 감소시킨다. 전원, 액추에이터, 통신 및 센서 하네스를 적절하게 구역화(Zoning)하면 방사 에너지가 민감한 회로에서 전도 간섭으로 변환되는 것을 방지할 수 있다.
+
+전도 방출은 일반적으로 정의된 전기 인터페이스에서 노이즈 전압 또는 전류를 측정하여 평가한다. 선로 임피던스 안정화 회로망(Line Impedance Stabilization Network, LISN)은 전원선 방출을 위한 제어된 임피던스와 측정 지점을 제공하며, 전류 프로브(Current Probe)는 케이블의 공통 모드 또는 차동 모드 전류를 측정할 수 있다. 이후 스펙트럼 분석(Spectrum Analysis)을 통해 스위칭 기본 주파수, 고조파, 공진 및 광대역 성분을 식별하고 측정된 피크를 특정 동작 메커니즘과 연관시킬 수 있다.
+
+방사 방출 진단(Radiated-Emission Diagnosis)은 안테나와 근접장 프로브를 사용하여 시스템 외부로 방출되는 전자기 에너지를 식별한다. 전기장 프로브(Electric-Field Probe)와 자기장 프로브(Magnetic-Field Probe)는 개발 과정에서 PCB 스위칭 노드, 전류 루프, 커넥터 및 케이블 영역을 국부적으로 식별할 수 있다. 공식적인 방사 방출 시험(Formal Radiated-Emission Test)은 규정된 거리와 구성에서 전자기장을 평가한다. 장비와 케이블의 방향이나 위치를 변경하면 방사의 방향성을 파악하고 지배적인 안테나 역할을 하는 구조를 식별할 수 있다.
+
+측정 결과는 항상 운전 상태(Operating State)와 연계하여 분석해야 한다. 모터 속도, 인버터 부하, 스위칭 주파수, 프로세서 활동, 통신 트래픽, 컨버터 동작 모드 및 회생 제동(Regenerative Braking)은 전도 및 방사 스펙트럼을 모두 변화시킬 수 있다. 개별 서브시스템을 켜고 끄거나 운전 조건을 변화시키면 원인이 되는 노이즈원을 식별할 수 있다. 이후 시간 영역 측정(Time-Domain Measurement)을 통해 스펙트럼 피크가 PWM 전환, 클록 동작, 링잉, 통신 에지 또는 주기적인 제어 이벤트와 관련되는지를 확인할 수 있다.
+
+로봇 EMC 엔지니어링(Robotic EMC Engineering)에서 방사 방출과 전도 방출은 궁극적으로 동일한 전자기 에너지가 서로 연결된 형태로 나타나는 현상으로 분석해야 한다. 발생원 생성(Source Generation), 결합 경로(Coupling Path), 전파 구조(Propagation Structure), 수신 서브시스템(Receiving Subsystem)은 완전한 간섭 체인(Interference Chain)을 구성한다. 따라서 PCB 레이아웃, 필터링, 접지, 차폐, 섀시 본딩, 커넥터 설계 및 하네스 라우팅을 통합적으로 조정하여 노이즈를 발생원에서 감소시키고, 전도 경로에서 차단하며, 방사 구조를 여기하지 못하도록 설계해야 한다.
+
+##  
+
+## 04.04. Common Mode vs Differential Mode
+
+![](images/image4.png){width="7.268055555555556in" height="7.268055555555556in"}
+
+Common-mode and differential-mode noise describe two fundamentally different ways unwanted electrical energy propagates through conductors in an electronic system. Differential-mode noise flows between two intended conductors, such as positive and return power lines, while common-mode noise flows in the same direction on multiple conductors relative to chassis or another reference. Distinguishing these modes is essential because their sources, coupling paths, radiation behavior, and suppression methods differ significantly.
+
+Differential-mode noise is generated when unwanted voltage appears between conductors that normally carry useful differential power or signals. In a DC/DC converter, pulsed switching current can create high-frequency noise between the positive supply and return line. In a motor inverter, switching and phase-current ripple generate similar differential components. The noise current leaves the source through one conductor and returns through the other, forming a closed differential current loop.
+
+The magnitude of differential-mode emission depends strongly on switching-current amplitude, edge speed, loop impedance, and the physical geometry of the current path. Parasitic inductance in PCB traces, bus bars, capacitor connections, and wiring can convert rapid current changes into voltage disturbances according to V = L·dI/dt. Large current loops also increase magnetic-field coupling, allowing differential-mode current to contribute to both conducted interference and radiated electromagnetic emission.
+
+Common-mode noise follows a different path. Instead of circulating primarily between two intended conductors, common-mode current travels in the same direction on several conductors and returns through chassis, protective earth, cable shields, mechanical structures, or parasitic capacitance. The intended circuit diagram may not show this path because it is frequently created by unintended capacitances distributed throughout the physical system.
+
+High dV/dt switching nodes are major sources of common-mode current. When voltage changes rapidly, parasitic capacitance carries displacement current according to I = C·dV/dt. Capacitance between switching devices and heat sinks, motor windings and frames, PCB copper and chassis, transformer windings, or cables and surrounding structures can therefore inject high-frequency current into the chassis. Even small parasitic capacitances can become important when switching edges are sufficiently fast.
+
+A useful way to distinguish the two modes is to examine current direction. In differential mode, current in one conductor travels toward the load while approximately equal current returns through the paired conductor. In common mode, high-frequency noise current travels in the same direction along both conductors relative to the reference structure. The common-mode return current then finds another path through chassis, shielding, parasitic capacitance, or surrounding conductive structures.
+
+The physical loop geometry is consequently different for each mode. Differential-mode current normally forms a relatively localized loop involving the source, conductors, and load. Common-mode current can form a much larger loop involving cables, chassis, enclosures, motor frames, grounding connections, and parasitic coupling. Because the effective loop and antenna structures can become large, relatively small common-mode currents may produce unexpectedly strong radiated emissions.
+
+Motor inverter systems provide a practical example of both mechanisms occurring simultaneously. PWM switching creates differential-mode components between motor phase conductors, while rapid phase-node voltage transitions drive common-mode current through winding-to-frame capacitance. The current can then flow through the motor housing, chassis, cable shield, and inverter structure. The same inverter can therefore require separate differential-mode and common-mode countermeasures.
+
+Switching power supplies show similar behavior. Pulsating input current generates differential-mode noise on the DC input pair, while switching-node voltage transitions couple through parasitic capacitance to chassis or nearby structures and generate common-mode noise. Output wiring can carry both modes simultaneously. Treating all measured noise as a single phenomenon can therefore lead to ineffective filters because a component designed for one propagation mode may provide little attenuation for the other.
+
+Differential-mode filtering generally uses components that present impedance to noise flowing between the line conductors. Series inductors combined with capacitors connected across the supply form common LC or π-filter structures. Input and output capacitors also provide short local paths for switching current. Their effectiveness depends on frequency-dependent impedance, equivalent series resistance, equivalent series inductance, placement, and the parasitic characteristics of the surrounding PCB and wiring.
+
+Common-mode filtering requires components that impede currents flowing in the same direction on multiple conductors. A common-mode choke provides high impedance to common-mode current while allowing intended differential current to pass with relatively low impedance. Chassis-referenced capacitors can provide controlled high-frequency return paths where safety and system architecture permit. Shielding and low-impedance chassis bonding are also important because common-mode suppression depends heavily on controlling the return path.
+
+Cable design has a strong influence on both modes. Closely spaced positive and return conductors reduce differential-loop area and associated magnetic radiation. Twisted pairs further improve field cancellation for differential currents. Cable shields primarily help control common-mode electric-field coupling and provide a defined high-frequency return path when properly terminated. Poor shield termination, especially through long pigtails, can add inductance and reduce effectiveness at high frequencies.
+
+Common-mode noise is particularly important in long robotic harnesses because cables can behave as efficient antennas. A small high-frequency current flowing simultaneously along multiple cable conductors can excite the entire cable relative to chassis. Motor cables, power harnesses, Ethernet cables, sensor cables, and external interfaces can therefore radiate even when their intended differential signals are well balanced. Connector shielding and 360-degree shield termination help prevent this conversion into radiation.
+
+Mode conversion can occur when circuit or cable symmetry is imperfect. Differential-mode energy may be converted into common-mode energy by unequal conductor impedance, asymmetric PCB routing, connector imbalance, mismatched filtering, or inconsistent parasitic capacitance. Conversely, externally coupled common-mode disturbance can produce differential voltage at a receiver if the two conductors experience different impedances. Maintaining symmetry is therefore an important EMC design principle for differential interfaces.
+
+Ground and chassis architecture are especially relevant to common-mode behavior. At high frequencies, current follows the path of lowest impedance rather than simply the path with the lowest DC resistance. Long grounding wires may have significant inductive impedance, while broad chassis connections can provide much lower high-frequency impedance. A grounding scheme that appears correct in a DC continuity test may therefore perform poorly when carrying megahertz common-mode currents.
+
+Measurement techniques can separate differential-mode and common-mode components. A current probe placed around both conductors of a power pair measures the residual current flowing in the same direction and therefore provides information about common-mode current. Measuring conductors individually and mathematically combining their currents can provide additional mode information. Differential voltage probes, LISN measurements, and spectrum analysis can then characterize line-to-line differential noise and frequency-dependent emission behavior.
+
+Diagnosis should also consider how measured noise changes when grounding, cable routing, shielding, or filter components are modified. A strong response to chassis bonding or shield termination often indicates an important common-mode path, while changes caused by line-to-line capacitors or series differential inductance suggest a differential-mode mechanism. Near-field probing can complement conducted measurements by locating high dV/dt electric-field sources and high dI/dt magnetic-field loops.
+
+In robotic systems, common-mode and differential-mode noise must ultimately be managed as related but distinct components of the electromagnetic interference environment. Switching converters, motor drives, computing systems, cables, sensors, chassis structures, and communication interfaces create many opportunities for both modes to propagate and convert between one another. Correct mode identification allows filtering, grounding, shielding, layout, bonding, and harness design to target the actual physical noise path rather than treating EMC as a generic filtering problem.
+
+공통 모드 노이즈(Common-Mode Noise)와 차동 모드 노이즈(Differential-Mode Noise)는 전자 시스템의 도체를 통해 원하지 않는 전기 에너지가 전파되는 근본적으로 서로 다른 두 가지 방식을 나타낸다. 차동 모드 노이즈는 양극 전원선과 리턴 전원선처럼 의도된 두 도체 사이를 흐르는 반면, 공통 모드 노이즈는 섀시(Chassis) 또는 다른 기준점을 기준으로 여러 도체에서 동일한 방향으로 흐른다. 두 모드는 발생원, 결합 경로, 방사 특성 및 억제 방법이 크게 다르므로 이를 구분하는 것이 매우 중요하다.
+
+차동 모드 노이즈(Differential-Mode Noise)는 정상적으로 유효한 차동 전력 또는 신호를 전달하는 도체 사이에 원하지 않는 전압이 발생할 때 생성된다. DC/DC 컨버터(DC/DC Converter)에서는 펄스 형태의 스위칭 전류가 양극 전원선과 리턴 선 사이에 고주파 노이즈를 발생시킬 수 있다. 모터 인버터(Motor Inverter)에서는 스위칭과 상 전류 리플(Phase-Current Ripple)이 유사한 차동 성분을 생성한다. 노이즈 전류는 하나의 도체를 통해 발생원에서 나가고 다른 도체를 통해 되돌아오면서 폐쇄된 차동 전류 루프를 형성한다.
+
+차동 모드 방출(Differential-Mode Emission)의 크기는 스위칭 전류의 진폭, 에지 속도(Edge Speed), 루프 임피던스 및 전류 경로의 물리적 형상에 크게 영향을 받는다. PCB 배선, 버스바(Bus Bar), 커패시터 연결부 및 배선의 기생 인덕턴스(Parasitic Inductance)는 V = L·dI/dt 관계에 따라 빠른 전류 변화를 전압 교란으로 변환할 수 있다. 또한 큰 전류 루프는 자기장 결합(Magnetic-Field Coupling)을 증가시켜 차동 모드 전류가 전도 간섭과 방사 전자기 방출 모두에 영향을 미치게 한다.
+
+공통 모드 노이즈(Common-Mode Noise)는 이와 다른 경로를 따른다. 공통 모드 전류는 주로 두 개의 의도된 도체 사이를 순환하는 대신 여러 도체를 따라 동일한 방향으로 흐르고, 섀시, 보호 접지(Protective Earth), 케이블 실드(Cable Shield), 기계 구조 또는 기생 커패시턴스(Parasitic Capacitance)를 통해 되돌아온다. 이러한 경로는 물리적 시스템 전체에 분포된 의도하지 않은 커패시턴스에 의해 형성되는 경우가 많으므로 의도된 회로도에는 나타나지 않을 수 있다.
+
+높은 전압 변화율(dV/dt)을 갖는 스위칭 노드는 공통 모드 전류(Common-Mode Current)의 주요 발생원이다. 전압이 빠르게 변화하면 기생 커패시턴스를 통해 I = C·dV/dt 관계에 따른 변위 전류(Displacement Current)가 흐른다. 스위칭 소자와 방열판(Heat Sink), 모터 권선과 프레임, PCB 구리 패턴과 섀시, 변압기 권선 또는 케이블과 주변 구조 사이의 커패시턴스는 고주파 전류를 섀시로 주입할 수 있다. 스위칭 에지가 충분히 빠르면 매우 작은 기생 커패시턴스도 중요한 영향을 미칠 수 있다.
+
+두 모드를 구분하는 유용한 방법은 전류 방향(Current Direction)을 살펴보는 것이다. 차동 모드에서는 하나의 도체에서 전류가 부하 방향으로 흐르는 동안 거의 동일한 전류가 짝을 이루는 다른 도체를 통해 반대 방향으로 되돌아온다. 공통 모드에서는 고주파 노이즈 전류가 기준 구조에 대해 두 도체 모두에서 동일한 방향으로 흐른다. 이후 공통 모드 리턴 전류는 섀시, 차폐, 기생 커패시턴스 또는 주변 도전성 구조를 통해 별도의 경로를 찾아 되돌아온다.
+
+따라서 각 모드의 물리적인 루프 형상(Loop Geometry)도 서로 다르다. 차동 모드 전류는 일반적으로 발생원, 도체 및 부하를 포함하는 비교적 국부적인 루프를 형성한다. 공통 모드 전류는 케이블, 섀시, 인클로저(Enclosure), 모터 프레임, 접지 연결 및 기생 결합을 포함하는 훨씬 큰 루프를 형성할 수 있다. 유효 루프와 안테나 구조가 커질 수 있기 때문에 비교적 작은 공통 모드 전류도 예상보다 강한 방사 방출(Radiated Emission)을 발생시킬 수 있다.
+
+모터 인버터 시스템(Motor Inverter System)은 두 메커니즘이 동시에 발생하는 대표적인 사례이다. PWM 스위칭은 모터 상 도체 사이에 차동 모드 성분을 생성하는 반면, 급격한 상 노드 전압 변화는 권선-프레임 간 커패시턴스(Winding-to-Frame Capacitance)를 통해 공통 모드 전류를 발생시킨다. 이 전류는 모터 하우징, 섀시, 케이블 실드 및 인버터 구조를 통해 흐를 수 있다. 따라서 동일한 인버터에서도 차동 모드와 공통 모드에 대해 서로 다른 대책이 필요할 수 있다.
+
+스위칭 전원 공급 장치(Switching Power Supply)에서도 유사한 현상이 나타난다. 펄스 형태의 입력 전류는 직류 입력 도체 쌍에서 차동 모드 노이즈를 발생시키는 반면, 스위칭 노드의 전압 변화는 기생 커패시턴스를 통해 섀시 또는 주변 구조로 결합되어 공통 모드 노이즈를 발생시킨다. 출력 배선에는 두 모드가 동시에 존재할 수 있다. 따라서 측정된 모든 노이즈를 하나의 현상으로 취급하면 비효율적인 필터 설계로 이어질 수 있는데, 특정 전파 모드용으로 설계된 부품은 다른 모드에 대해서는 거의 감쇠 효과를 제공하지 못할 수 있기 때문이다.
+
+차동 모드 필터링(Differential-Mode Filtering)은 일반적으로 선간 도체 사이를 흐르는 노이즈에 임피던스를 제공하는 부품을 사용한다. 직렬 인덕터와 전원선 사이에 연결된 커패시터를 조합하면 일반적인 LC 필터 또는 파이 필터(π-Filter)를 구성할 수 있다. 입력 및 출력 커패시터는 스위칭 전류에 짧은 국부 리턴 경로를 제공한다. 이러한 필터의 효과는 주파수에 따른 임피던스, 등가 직렬 저항(ESR), 등가 직렬 인덕턴스(ESL), 배치 및 주변 PCB와 배선의 기생 특성에 따라 결정된다.
+
+공통 모드 필터링(Common-Mode Filtering)은 여러 도체에서 동일한 방향으로 흐르는 전류를 방해하는 부품을 필요로 한다. 공통 모드 초크(Common-Mode Choke)는 공통 모드 전류에는 높은 임피던스를 제공하면서 의도된 차동 전류는 비교적 낮은 임피던스로 통과시킨다. 안전 및 시스템 아키텍처가 허용하는 경우 섀시 기준 커패시터(Chassis-Referenced Capacitor)를 사용하여 제어된 고주파 리턴 경로를 제공할 수 있다. 공통 모드 억제는 리턴 경로 제어에 크게 의존하므로 차폐(Shielding)와 저임피던스 섀시 본딩(Low-Impedance Chassis Bonding)도 중요하다.
+
+케이블 설계(Cable Design)는 두 모드 모두에 큰 영향을 미친다. 양극 및 리턴 도체를 서로 가깝게 배치하면 차동 루프 면적과 그에 따른 자기장 방사를 줄일 수 있다. 트위스티드 페어(Twisted Pair)는 차동 전류의 전자기장 상쇄 효과를 더욱 향상시킨다. 케이블 실드는 주로 공통 모드 전기장 결합을 제어하며, 적절하게 종단될 경우 명확한 고주파 리턴 경로를 제공한다. 특히 긴 피그테일(Pigtail)을 이용한 부적절한 실드 종단은 인덕턴스를 증가시켜 고주파에서 차폐 효과를 저하시킬 수 있다.
+
+공통 모드 노이즈는 케이블이 효과적인 안테나처럼 동작할 수 있기 때문에 긴 로봇 하네스(Long Robotic Harness)에서 특히 중요하다. 여러 케이블 도체를 따라 동시에 흐르는 작은 고주파 전류도 섀시를 기준으로 전체 케이블을 여기할 수 있다. 따라서 모터 케이블, 전원 하네스, 이더넷(Ethernet) 케이블, 센서 케이블 및 외부 인터페이스는 의도된 차동 신호가 충분히 균형을 이루고 있더라도 방사할 수 있다. 커넥터 차폐와 360도 실드 종단(360-Degree Shield Termination)은 이러한 방사로의 변환을 억제하는 데 도움이 된다.
+
+회로 또는 케이블의 대칭성(Symmetry)이 불완전하면 모드 변환(Mode Conversion)이 발생할 수 있다. 차동 모드 에너지는 서로 다른 도체 임피던스, 비대칭 PCB 라우팅(Asymmetric PCB Routing), 커넥터 불균형, 필터 불일치 또는 불균일한 기생 커패시턴스에 의해 공통 모드 에너지로 변환될 수 있다. 반대로 외부에서 결합된 공통 모드 교란도 두 도체가 서로 다른 임피던스를 갖는 경우 수신기에서 차동 전압을 생성할 수 있다. 따라서 대칭성을 유지하는 것은 차동 인터페이스에서 중요한 EMC 설계 원칙이다.
+
+접지 및 섀시 아키텍처(Ground and Chassis Architecture)는 공통 모드 동작과 특히 밀접하게 관련된다. 고주파에서 전류는 단순히 직류 저항이 가장 낮은 경로가 아니라 임피던스가 가장 낮은 경로를 따라 흐른다. 긴 접지선은 상당한 유도성 임피던스(Inductive Impedance)를 가질 수 있는 반면, 넓은 면적의 섀시 연결은 훨씬 낮은 고주파 임피던스를 제공할 수 있다. 따라서 직류 연속성 시험(DC Continuity Test)에서는 적절하게 보이는 접지 방식도 메가헤르츠 영역의 공통 모드 전류를 전달할 때는 성능이 좋지 않을 수 있다.
+
+측정 기법(Measurement Technique)을 사용하면 차동 모드와 공통 모드 성분을 분리할 수 있다. 전원 도체 쌍의 두 도체를 함께 감싸도록 전류 프로브(Current Probe)를 배치하면 동일한 방향으로 흐르는 잔류 전류를 측정하므로 공통 모드 전류에 대한 정보를 얻을 수 있다. 각 도체를 개별적으로 측정하고 전류를 수학적으로 조합하면 추가적인 모드 정보를 얻을 수 있다. 이후 차동 전압 프로브(Differential Voltage Probe), 선로 임피던스 안정화 회로망(Line Impedance Stabilization Network, LISN) 측정 및 스펙트럼 분석(Spectrum Analysis)을 통해 선간 차동 노이즈와 주파수별 방출 특성을 분석할 수 있다.
+
+진단(Diagnosis)에서는 접지, 케이블 라우팅, 차폐 또는 필터 부품을 변경했을 때 측정된 노이즈가 어떻게 변화하는지도 검토해야 한다. 섀시 본딩이나 실드 종단을 변경했을 때 노이즈가 크게 변화한다면 중요한 공통 모드 경로가 존재할 가능성이 높다. 반대로 선간 커패시터(Line-to-Line Capacitor) 또는 직렬 차동 인덕턴스를 변경했을 때 변화가 크다면 차동 모드 메커니즘을 의심할 수 있다. 근접장 프로빙(Near-Field Probing)을 함께 사용하면 높은 dV/dt 전기장 발생원과 높은 dI/dt 자기장 루프의 위치를 식별할 수 있다.
+
+로봇 시스템에서 공통 모드와 차동 모드 노이즈는 궁극적으로 서로 연관되어 있지만 구별되는 전자기 간섭(Electromagnetic Interference, EMI) 환경의 구성 요소로 관리해야 한다. 스위칭 컨버터, 모터 드라이브, 컴퓨팅 시스템, 케이블, 센서, 섀시 구조 및 통신 인터페이스는 두 모드가 전파되거나 서로 변환될 수 있는 다양한 경로를 형성한다. 정확한 모드 식별을 통해 필터링, 접지, 차폐, 레이아웃, 본딩 및 하네스 설계가 일반적인 노이즈 억제가 아니라 실제 물리적 노이즈 경로를 직접 대상으로 하도록 설계할 수 있다.
+
+##  
+
+## 04.05. Near Field EMI Mapping
+
+![](images/image5.png){width="7.268055555555556in" height="7.268055555555556in"}
+
+Near-field EMI mapping is a diagnostic technique used to locate electromagnetic noise sources and coupling paths directly around electronic hardware. Instead of measuring emissions several meters away as in formal radiated-emission testing, near-field mapping examines localized electric and magnetic fields close to PCBs, converters, motor drives, connectors, cables, and enclosures. It provides spatial information that helps engineers determine where unwanted electromagnetic energy is generated.
+
+The electromagnetic field close to a circuit behaves differently from a fully developed far-field electromagnetic wave. In the near-field region, electric and magnetic field components may exist with different relative strengths depending on the source structure. High-voltage, high-impedance switching nodes tend to create strong electric fields, whereas high-current loops and rapidly changing currents tend to generate strong magnetic fields. Separate probes are therefore commonly used to investigate these mechanisms.
+
+An electric-field probe, often called an E-field probe, responds primarily to electric fields produced by rapidly changing voltages. It is useful for examining switching nodes, MOSFET drain regions, transformer windings, high-speed digital traces, connectors, and other structures with high dV/dt. Moving the probe across a PCB allows engineers to identify regions where electric-field intensity increases and to relate those regions to specific circuit functions or switching events.
+
+A magnetic-field probe, or H-field probe, is particularly useful for locating high-frequency current loops. The probe normally contains a small loop that responds to changing magnetic flux. Areas around switching MOSFETs, DC-link capacitors, rectifiers, inductors, power traces, and return paths can be scanned to locate high dI/dt loops. Smaller probe loops provide better spatial resolution, while larger probes generally offer greater sensitivity but less precise localization.
+
+Near-field mapping is most useful when spatial position is combined with frequency information. A probe can be connected to a spectrum analyzer or suitable measurement receiver while it is moved over the equipment under test. At each position, the amplitude of selected frequencies or frequency bands can be recorded. Repeating the measurement across a defined surface produces a map showing where specific switching harmonics, resonances, clock frequencies, or broadband disturbances are strongest.
+
+Manual probing provides a rapid method for troubleshooting during development. An engineer can move the probe over suspicious PCB areas while observing the spectrum analyzer and identify locations where emission peaks increase significantly. This approach is effective for quickly comparing switching nodes, power loops, connectors, cable exits, and grounding regions. However, probe orientation, height, pressure, and position must remain reasonably consistent if measurements are to be compared reliably.
+
+Automated near-field scanning improves repeatability by moving a probe across the device using a controlled positioning system. A defined X-Y grid is scanned while frequency-domain measurements are collected at each point. The resulting data can be converted into two-dimensional field-intensity maps. More advanced systems may scan at multiple heights or orientations, allowing engineers to investigate how electromagnetic fields spread away from the PCB or enclosure surface.
+
+Probe orientation is critical because near-field probes are directional. Rotating an H-field loop changes its sensitivity to magnetic flux orientation and can reveal the direction of current flow or the geometry of a dominant loop. Similarly, E-field measurements depend on probe geometry and orientation relative to conductive surfaces. A single scan orientation may therefore miss an important source, so suspicious regions should often be examined using multiple probe orientations.
+
+Probe distance also has a strong effect on measured amplitude and spatial resolution. Bringing a probe closer to the source generally increases sensitivity to localized fields and helps distinguish neighboring structures. Increasing the distance causes fields from multiple sources to combine and reduces spatial detail. For comparative mapping, maintaining a consistent probe height is essential because amplitude changes caused by distance can otherwise be mistaken for differences in actual emission strength.
+
+The measurement system must provide sufficient frequency range and dynamic range for the expected noise source. Switching converters may generate harmonics far above their fundamental switching frequency, while digital processors and communication interfaces can produce emissions extending into hundreds of megahertz or beyond. Spectrum analyzer resolution bandwidth, detector settings, frequency span, preamplification, and probe characteristics should be selected according to the diagnostic objective rather than using one configuration for every measurement.
+
+Near-field mapping is especially valuable for analyzing switching power supplies. Strong magnetic-field regions often reveal high-frequency commutation loops involving MOSFETs, diodes, input capacitors, and switching paths. Electric-field scans can identify large switching-node copper regions or transformer structures carrying rapid voltage transitions. Comparing maps before and after layout changes, snubber installation, gate-slew adjustment, or capacitor relocation provides direct evidence of whether a countermeasure reduces local electromagnetic activity.
+
+Motor inverters can be investigated in a similar manner. H-field probing can identify high dI/dt regions around DC-link capacitors, bus bars, switching bridges, and phase outputs, while E-field probing can locate high dV/dt switching structures. Scanning connectors and cable exits can reveal where internal inverter noise begins coupling onto external wiring. These measurements help distinguish a localized power-stage problem from a cable, shielding, grounding, or chassis-related propagation problem.
+
+Near-field measurements are also useful for communication and perception electronics. Ethernet PHY regions, clock oscillators, processors, memory interfaces, camera interfaces, and high-speed serial links can produce localized spectral signatures. A field map can reveal whether emissions originate from the device itself, PCB routing, connector transitions, or cable common-mode currents. This is valuable in robots where sensitive communication electronics operate close to high-power motor and converter systems.
+
+A major advantage of near-field mapping is the ability to correlate physical location with circuit behavior. If a spectral peak occurs at the switching frequency and its harmonics, the strongest mapped region may identify the responsible converter loop. A peak associated with a processor clock may localize around digital routing or a connector. Combining schematic knowledge, PCB layout, time-domain waveforms, and near-field maps allows the electromagnetic source and coupling mechanism to be identified more confidently.
+
+Near-field mapping can also evaluate design modifications before expensive compliance testing. Engineers can compare baseline and modified scans after changing component placement, reducing loop area, improving decoupling, adding shielding, modifying ground connections, or rerouting cables. A reduction in localized field amplitude does not automatically guarantee regulatory compliance, but it provides a practical indication that the underlying emission mechanism has been reduced before formal chamber measurements are performed.
+
+Care must be taken because a near-field probe can disturb the circuit being measured. Conductive probe structures placed very close to sensitive nodes can alter parasitic capacitance, inductance, resonance frequency, or local current distribution. The measured amplitude is also probe-dependent and should not automatically be interpreted as absolute radiated field strength at a regulatory distance. Near-field mapping is primarily a comparative and diagnostic technique unless the measurement system has been specifically calibrated for quantitative field reconstruction.
+
+A systematic robotic EMI investigation can therefore begin with system-level spectrum measurements, identify problematic frequencies, and then use near-field mapping to localize their physical origins. The investigation can progress from enclosure and cable regions toward individual PCB sections and components. Once the dominant source is identified, engineers can modify layout, filtering, grounding, shielding, switching behavior, or cable routing and repeat the scan to verify whether the electromagnetic field has been reduced.
+
+Near-field EMI mapping ultimately connects frequency-domain EMC measurements with the physical architecture of a robotic electrical system. By distinguishing electric-field and magnetic-field sources, mapping their spatial distribution, and correlating them with switching and operating conditions, engineers can trace noise from semiconductor devices and PCB loops into connectors, cables, chassis structures, and neighboring electronics. This makes near-field mapping a powerful bridge between EMC diagnosis, design correction, and final system validation.
+
+근접장 EMI 매핑(Near-Field EMI Mapping)은 전자 하드웨어 주변에서 전자기 노이즈원(Electromagnetic Noise Source)과 결합 경로(Coupling Path)를 직접 찾아내는 데 사용되는 진단 기법이다. 공식적인 방사 방출 시험(Radiated-Emission Testing)처럼 수 미터 떨어진 거리에서 방출을 측정하는 대신, 근접장 매핑은 PCB, 컨버터, 모터 드라이브, 커넥터, 케이블 및 인클로저 가까이의 국부적인 전기장과 자기장을 조사한다. 이를 통해 원하지 않는 전자기 에너지가 어디에서 발생하는지 판단할 수 있는 공간적 정보를 얻을 수 있다.
+
+회로 가까이의 전자기장(Electromagnetic Field)은 완전히 형성된 원거리장 전자기파(Far-Field Electromagnetic Wave)와 다르게 동작한다. 근접장 영역(Near-Field Region)에서는 발생원 구조에 따라 전기장과 자기장 성분이 서로 다른 상대적 세기로 존재할 수 있다. 높은 전압과 높은 임피던스를 갖는 스위칭 노드는 강한 전기장을 생성하는 경향이 있으며, 고전류 루프와 빠르게 변화하는 전류는 강한 자기장을 생성하는 경향이 있다. 따라서 이러한 메커니즘을 조사하기 위해 일반적으로 서로 다른 종류의 프로브(Probe)를 사용한다.
+
+전기장 프로브(Electric-Field Probe), 즉 E-필드 프로브(E-Field Probe)는 주로 빠르게 변화하는 전압에 의해 생성되는 전기장에 반응한다. 스위칭 노드, MOSFET 드레인 영역, 변압기 권선, 고속 디지털 배선, 커넥터 및 높은 전압 변화율(dV/dt)을 갖는 기타 구조를 조사하는 데 유용하다. 프로브를 PCB 위에서 이동시키면 전기장 세기가 증가하는 영역을 식별하고 해당 영역을 특정 회로 기능이나 스위칭 동작과 연관시킬 수 있다.
+
+자기장 프로브(Magnetic-Field Probe), 즉 H-필드 프로브(H-Field Probe)는 고주파 전류 루프를 찾아내는 데 특히 유용하다. 프로브는 일반적으로 변화하는 자속(Magnetic Flux)에 반응하는 작은 루프를 포함한다. 스위칭 MOSFET, 직류 링크 커패시터(DC-Link Capacitor), 정류기(Rectifier), 인덕터, 전력 배선 및 리턴 경로 주변을 스캔하여 높은 전류 변화율(dI/dt)을 갖는 루프를 찾을 수 있다. 작은 프로브 루프는 더 높은 공간 분해능(Spatial Resolution)을 제공하며, 큰 프로브는 일반적으로 더 높은 감도를 제공하지만 정확한 위치 식별 능력은 감소한다.
+
+근접장 매핑은 공간적 위치(Spatial Position)와 주파수 정보(Frequency Information)를 결합할 때 가장 유용하다. 프로브를 스펙트럼 분석기(Spectrum Analyzer) 또는 적절한 측정 수신기(Measurement Receiver)에 연결한 상태에서 시험 대상 장비 주변으로 이동시킬 수 있다. 각 위치에서 선택한 주파수 또는 주파수 대역의 진폭을 기록할 수 있다. 정의된 표면 전체에서 이러한 측정을 반복하면 특정 스위칭 고조파, 공진, 클록 주파수 또는 광대역 교란이 가장 강하게 나타나는 위치를 보여주는 맵을 생성할 수 있다.
+
+수동 프로빙(Manual Probing)은 개발 과정에서 신속하게 문제를 진단할 수 있는 방법을 제공한다. 엔지니어는 스펙트럼 분석기를 관찰하면서 의심되는 PCB 영역 위로 프로브를 이동시키고 방출 피크가 크게 증가하는 위치를 찾아낼 수 있다. 이 방법은 스위칭 노드, 전력 루프, 커넥터, 케이블 출구 및 접지 영역을 빠르게 비교하는 데 효과적이다. 그러나 측정 결과를 신뢰성 있게 비교하려면 프로브의 방향, 높이, 압력 및 위치를 가능한 한 일정하게 유지해야 한다.
+
+자동화 근접장 스캐닝(Automated Near-Field Scanning)은 제어된 위치 결정 시스템(Positioning System)을 사용하여 프로브를 장치 위로 이동시킴으로써 측정 반복성을 향상시킨다. 정의된 X-Y 격자(X-Y Grid)를 따라 스캔하면서 각 지점에서 주파수 영역 측정을 수행한다. 수집된 데이터는 2차원 전계 강도 맵(Two-Dimensional Field-Intensity Map)으로 변환할 수 있다. 더욱 발전된 시스템에서는 여러 높이 또는 방향에서 스캔하여 전자기장이 PCB나 인클로저 표면으로부터 어떻게 확산되는지를 조사할 수 있다.
+
+근접장 프로브는 방향성(Directional Characteristic)을 가지므로 프로브 방향(Probe Orientation)이 매우 중요하다. H-필드 루프를 회전시키면 자속 방향에 대한 감도가 달라지며, 이를 통해 전류 흐름의 방향이나 지배적인 루프 형상을 파악할 수 있다. 마찬가지로 E-필드 측정도 도전성 표면에 대한 프로브 형상과 방향의 영향을 받는다. 따라서 하나의 스캔 방향만으로는 중요한 노이즈원을 놓칠 수 있으므로 의심되는 영역은 여러 프로브 방향을 사용하여 조사하는 것이 바람직하다.
+
+프로브 거리(Probe Distance) 역시 측정 진폭과 공간 분해능에 큰 영향을 준다. 프로브를 발생원 가까이 이동시키면 일반적으로 국부적인 전자기장에 대한 감도가 높아지고 서로 인접한 구조를 구분하기 쉬워진다. 거리가 증가하면 여러 발생원에서 나온 전자기장이 서로 결합하면서 공간적 세부 정보가 감소한다. 비교 매핑(Comparative Mapping)에서는 거리 변화로 발생한 진폭 차이를 실제 방출 강도의 차이로 잘못 판단하지 않도록 일정한 프로브 높이를 유지하는 것이 필수적이다.
+
+측정 시스템(Measurement System)은 예상되는 노이즈원에 적합한 주파수 범위와 동적 범위(Dynamic Range)를 제공해야 한다. 스위칭 컨버터는 기본 스위칭 주파수보다 훨씬 높은 고조파를 생성할 수 있으며, 디지털 프로세서와 통신 인터페이스는 수백 메가헤르츠 이상의 영역까지 방출을 발생시킬 수 있다. 스펙트럼 분석기의 분해능 대역폭(Resolution Bandwidth), 검출기 설정, 주파수 스팬(Frequency Span), 전치 증폭(Preamplification) 및 프로브 특성은 모든 측정에 동일한 설정을 사용하는 것이 아니라 진단 목적에 맞게 선택해야 한다.
+
+근접장 매핑은 스위칭 전원 공급 장치(Switching Power Supply)를 분석하는 데 특히 유용하다. 강한 자기장 영역은 MOSFET, 다이오드, 입력 커패시터 및 스위칭 경로를 포함하는 고주파 정류 전환 루프(High-Frequency Commutation Loop)를 나타내는 경우가 많다. 전기장 스캔은 빠른 전압 전환이 발생하는 넓은 스위칭 노드 구리 영역이나 변압기 구조를 식별할 수 있다. 레이아웃 변경, 스너버(Snubber) 설치, 게이트 슬루율(Gate Slew Rate) 조정 또는 커패시터 재배치 전후의 맵을 비교하면 대책이 국부적인 전자기 활동을 감소시켰는지 직접 확인할 수 있다.
+
+모터 인버터(Motor Inverter)도 유사한 방법으로 조사할 수 있다. H-필드 프로빙은 직류 링크 커패시터, 버스바(Bus Bar), 스위칭 브리지 및 상 출력 주변의 높은 dI/dt 영역을 식별할 수 있으며, E-필드 프로빙은 높은 dV/dt를 갖는 스위칭 구조를 찾아낼 수 있다. 커넥터와 케이블 출구를 스캔하면 인버터 내부의 노이즈가 외부 배선으로 결합되기 시작하는 위치를 확인할 수 있다. 이러한 측정은 국부적인 전력단 문제와 케이블, 차폐, 접지 또는 섀시 관련 전파 문제를 구분하는 데 도움이 된다.
+
+근접장 측정(Near-Field Measurement)은 통신 및 인지 전자장치(Perception Electronics)를 분석하는 데에도 유용하다. 이더넷 물리 계층(Ethernet PHY), 클록 발진기(Clock Oscillator), 프로세서, 메모리 인터페이스, 카메라 인터페이스 및 고속 직렬 링크는 국부적인 스펙트럼 특성을 생성할 수 있다. 전자기장 맵은 방출이 소자 자체, PCB 라우팅, 커넥터 전환부 또는 케이블 공통 모드 전류에서 발생하는지를 파악하는 데 도움을 준다. 이는 민감한 통신 전자장치가 고전력 모터 및 컨버터 시스템 가까이에서 동작하는 로봇에서 특히 유용하다.
+
+근접장 매핑의 주요 장점은 물리적 위치를 회로 동작과 연계할 수 있다는 것이다. 스위칭 주파수와 그 고조파에서 스펙트럼 피크가 발생하는 경우 가장 강한 영역이 표시된 맵을 통해 원인이 되는 컨버터 루프를 식별할 수 있다. 프로세서 클록과 관련된 피크는 디지털 배선 또는 커넥터 주변에 집중될 수 있다. 회로도, PCB 레이아웃, 시간 영역 파형(Time-Domain Waveform), 근접장 맵을 함께 분석하면 전자기 노이즈원과 결합 메커니즘을 더욱 신뢰성 있게 식별할 수 있다.
+
+근접장 매핑은 비용이 높은 적합성 시험(Compliance Testing)을 수행하기 전에 설계 변경의 효과를 평가하는 데에도 사용할 수 있다. 엔지니어는 부품 배치 변경, 루프 면적 감소, 디커플링(Decoupling) 개선, 차폐 추가, 접지 연결 변경 또는 케이블 재배선 이후 기준 스캔(Baseline Scan)과 수정된 스캔을 비교할 수 있다. 국부적인 전자기장 진폭 감소가 규제 적합성을 자동으로 보장하는 것은 아니지만, 공식적인 전자파 무반사실 시험(Formal Chamber Measurement)을 수행하기 전에 근본적인 방출 메커니즘이 감소했음을 보여주는 실용적인 지표가 된다.
+
+근접장 프로브 자체가 측정 대상 회로에 영향을 줄 수 있으므로 주의해야 한다. 민감한 노드에 매우 가까이 배치된 도전성 프로브 구조는 기생 커패시턴스, 인덕턴스, 공진 주파수 또는 국부적인 전류 분포를 변화시킬 수 있다. 또한 측정된 진폭은 프로브 특성에 따라 달라지므로 규정된 거리에서의 절대 방사 전계 강도(Absolute Radiated Field Strength)로 직접 해석해서는 안 된다. 측정 시스템이 정량적 전자기장 복원(Quantitative Field Reconstruction)을 위해 특별히 교정되지 않았다면 근접장 매핑은 기본적으로 비교 및 진단 기법으로 사용해야 한다.
+
+따라서 체계적인 로봇 EMI 조사(Systematic Robotic EMI Investigation)는 시스템 수준의 스펙트럼 측정에서 시작하여 문제가 되는 주파수를 식별한 후 근접장 매핑을 이용해 해당 주파수의 물리적인 발생 위치를 찾아가는 방식으로 진행할 수 있다. 조사는 인클로저와 케이블 영역에서 시작하여 개별 PCB 영역과 부품 수준으로 점차 좁혀갈 수 있다. 지배적인 노이즈원이 확인되면 레이아웃, 필터링, 접지, 차폐, 스위칭 동작 또는 케이블 라우팅을 수정하고 다시 스캔하여 전자기장이 감소했는지 검증할 수 있다.
+
+근접장 EMI 매핑(Near-Field EMI Mapping)은 궁극적으로 주파수 영역 EMC 측정(Frequency-Domain EMC Measurement)과 로봇 전기 시스템의 물리적 아키텍처를 연결한다. 전기장과 자기장 발생원을 구분하고 그 공간적 분포를 매핑하며 스위칭 및 운전 조건과 연계함으로써 반도체 소자와 PCB 루프에서 발생한 노이즈가 커넥터, 케이블, 섀시 구조 및 인접 전자장치로 전달되는 과정을 추적할 수 있다. 따라서 근접장 매핑은 EMC 진단, 설계 개선 및 최종 시스템 검증을 연결하는 강력한 기술적 수단이 된다.
